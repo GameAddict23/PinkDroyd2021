@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import java.lang.Math;
 
 @Autonomous(name="Forward", group="Linear Opmode")
 //@Disabled
@@ -43,13 +44,30 @@ public class Forward extends LinearOpMode {
         rightDrive1.setPower(powerRight);
         rightDrive2.setPower(powerRight);
     }
-    //strafing
-    public void strafe(double power){
-        leftDrive0.setPower(-1*power);
-        leftDrive3.setPower(power);
+    //Turning
+    /*
+    public void turnRight(boolean right){
         
-        rightDrive1.setPower(power);
-        rightDrive2.setPower(-1*power);
+    }
+    */
+    //strafing
+    public void strafe(double power, String direction){
+        power = Math.abs(power);
+        if (direction.equals("left")){
+            leftDrive3.setPower(power*-1);
+            rightDrive2.setPower(power*-1);
+            
+            rightDrive1.setPower(power);
+            leftDrive0.setPower(power);
+        }
+        else if (direction.equals("right")){
+            leftDrive3.setPower(power);
+            rightDrive2.setPower(power);
+            
+            rightDrive1.setPower(power*-1);
+            leftDrive0.setPower(power*-1);
+        }
+        
     }
     
     //stops motor power by setting it to 0
@@ -90,34 +108,53 @@ public class Forward extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-/*
-        setMotorPower(0.5);
+        
+        //move forward
+        /*setMotorPower(0.5);
         sleep(2000);
         
+        //move backward
         setMotorPower(-0.5);
-        sleep(2000);
-*/
+        sleep(2000);*/
+        
         //pivot turn left
-        setMotorPower(0.5, -0.5);
-        sleep(1000);
+        // setMotorPower(0.5, -0.5);
+        // sleep(1000);
         
         stopMotors();
         sleep(1000);
         
-        //pivot turn right 
-        setMotorPower(-0.5, 0.5);
+        // //pivot turn right 
+        // setMotorPower(-0.5, 0.5);
+        // sleep(1000);
+        
+    /*
+        leftDrive0.setPower(-0.5);
+        rightDrive1.setPower(-0.5);
+        rightDrive2.setPower(0.5);
+        leftDrive3.setPower(0.5);
+        sleep(2500);
+       
+        stopMotors();
+        sleep(2000);
+    */
+        
+        
+ 
+        strafe(0.75, "left");
         sleep(1000);
         
-        strafe(0.5);
-        sleep(1000);
+        stopMotors();
+        sleep(1500);
         
-        strafe(-0.5);
+        strafe(0.75, "right");
         sleep(1000);
 /*
         setMotorPower(1);
         sleep(1500);
 */
         //stops the robot 
+        
         stopMotors();
     }
 }

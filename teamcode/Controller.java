@@ -1,17 +1,19 @@
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import java.lang.Math;
 
 
 //Control for Moving Forward and Backward
 
-@TeleOp(name="GamePad", group="Linear Opmode")
+@TeleOp(name="Controller", group="Linear Opmode")
 //@Disabled
 public class Controller extends LinearOpMode {
 
@@ -20,41 +22,110 @@ public class Controller extends LinearOpMode {
     //private DcMotor leftDrive = null;
     //private DcMotor rightDrive = null;
 
-    DcMotor leftDrive;
-    DcMotor rightDrive;
-    DcMotor leftDrive2;
-    DcMotor rightDrive2;
+    //NeveRest 20 Gearmotors
+    DcMotor leftDrive0; //motor 0
+    DcMotor leftDrive3; // motor 1
+    DcMotor rightDrive1; //motor 2
+    DcMotor rightDrive2; //motor 3
     
     Gamepad control = new Gamepad();
+    
+    public void setMotorPower(double power){
+        leftDrive0.setPower(power);
+        leftDrive3.setPower(power);
+        
+        rightDrive1.setPower(power);
+        rightDrive2.setPower(power);
+    }
+    //sets left and right motors power seperately  
+    public void setMotorPower(double powerLeft, double powerRight){
+        leftDrive0.setPower(powerLeft);
+        leftDrive3.setPower(powerLeft);
+        
+        rightDrive1.setPower(powerRight);
+        rightDrive2.setPower(powerRight);
+    }
+    
+    public void main(String[] args){
+        runOpMode();
+    }
+    
+    public void strafe(double power, String direction){
+        power = Math.abs(power);
+        if (direction.equals("left")){
+            leftDrive3.setPower(power*-1);
+            rightDrive2.setPower(power*-1);
+            
+            rightDrive1.setPower(power);
+            leftDrive0.setPower(power);
+        }
+        else if (direction.equals("right")){
+            leftDrive3.setPower(power);
+            rightDrive2.setPower(power);
+            
+            rightDrive1.setPower(power*-1);
+            leftDrive0.setPower(power*-1);
+        }
+        
+    }
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
-
-        leftDrive2.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive2.setDirection(DcMotor.Direction.REVERSE);
+        leftDrive0 = hardwareMap.get(DcMotor.class, "leftDrive0");
+        rightDrive1 = hardwareMap.get(DcMotor.class, "rightDrive1");
         
-        leftDrive2  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive2 = hardwareMap.get(DcMotor.class, "right_drive");
+        leftDrive3  = hardwareMap.get(DcMotor.class, "leftDrive3");
+        rightDrive2 = hardwareMap.get(DcMotor.class, "rightDrive2");
 
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+
+        // Most robots need the motor on one side to be reversed to drive forward
+        // Reverse the motor that runs backwards when connected directly to the battery
+
+        leftDrive0.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive1.setDirection(DcMotor.Direction.REVERSE);
+        
+        leftDrive3.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive2.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();
         runtime.reset();
-
+            
+            double powerLeft = gamepad1.left_stick_y;
+            double powerRight= gamepad1.right_stick_y;
+            double turn  =  gamepad1.right_stick_y;
+            boolean G1rightBumper = gamepad1.right_bumper;
+            boolean G1leftBumper = gamepad1.left_bumper;
+           
         while (opModeIsActive()) {
+            
+            telemetry.addData("Status", "Run Time");
+            telemetry.update();    
+            powerLeft =  Range.clip(powerLeft, -1.0, 1.0) ;
+            powerRight = Range.clip(powerRight, -1.0, 1.0) ;
+            
+            leftDrive0.setPower(-powerLeft);
+            rightDrive1.setPower(powerRight);
+            leftDrive3.setPower(powerLeft);
+            rightDrive2.setPower(-powerRight);
+            
             telemetry.addData("Status", "Run Time");
             telemetry.update();
 
-            leftDrive.setPower(-control.left_stick_y);
-            rightDrive.setPower(-control.right_stick_y);
-            leftDrive2.setPower(-control.left_stick_y);
-            rightDrive2.setPower(-control.right_stick_y);
+            leftDrive0.setPower(-gamepad1.left_stick_y);
+            rightDrive1.setPower(-gamepad1.right_stick_y);
+            leftDrive3.setPower(-gamepad1.left_stick_y);
+            rightDrive2.setPower(-gamepad1.right_stick_y);
+            
+            if(gamepad1.b){
+                strafe(1, "right");
+            }
+            else if(gamepad1.x){
+                strafe(1, "left");
+            }
+            
         }
     }
 }
