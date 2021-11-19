@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import java.lang.Math;
 
 
 //Control for Moving Forward and Backward
@@ -27,27 +26,23 @@ public class Controller extends LinearOpMode {
     DcMotor leftDrive3; // motor 1
     DcMotor rightDrive1; //motor 2
     DcMotor rightDrive2; //motor 3
-    
+
     Gamepad control = new Gamepad();
-    
+
     public void setMotorPower(double power){
         leftDrive0.setPower(power);
         leftDrive3.setPower(power);
-        
+
         rightDrive1.setPower(power);
         rightDrive2.setPower(power);
     }
-    //sets left and right motors power seperately  
+    //sets left and right motors power seperately
     public void setMotorPower(double powerLeft, double powerRight){
         leftDrive0.setPower(powerLeft);
         leftDrive3.setPower(powerLeft);
-        
+
         rightDrive1.setPower(powerRight);
         rightDrive2.setPower(powerRight);
-    }
-    
-    public void main(String[] args){
-        runOpMode();
     }
     
     public void strafe(double power, String direction){
@@ -76,7 +71,7 @@ public class Controller extends LinearOpMode {
 
         leftDrive0 = hardwareMap.get(DcMotor.class, "leftDrive0");
         rightDrive1 = hardwareMap.get(DcMotor.class, "rightDrive1");
-        
+
         leftDrive3  = hardwareMap.get(DcMotor.class, "leftDrive3");
         rightDrive2 = hardwareMap.get(DcMotor.class, "rightDrive2");
 
@@ -86,46 +81,43 @@ public class Controller extends LinearOpMode {
 
         leftDrive0.setDirection(DcMotor.Direction.FORWARD);
         rightDrive1.setDirection(DcMotor.Direction.REVERSE);
-        
+
         leftDrive3.setDirection(DcMotor.Direction.FORWARD);
         rightDrive2.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();
         runtime.reset();
-            
+
             double powerLeft = gamepad1.left_stick_y;
             double powerRight= gamepad1.right_stick_y;
             double turn  =  gamepad1.right_stick_y;
-            boolean G1rightBumper = gamepad1.right_bumper;
-            boolean G1leftBumper = gamepad1.left_bumper;
-           
+            boolean ifStick = false;
+
         while (opModeIsActive()) {
-            
-            telemetry.addData("Status", "Run Time");
-            telemetry.update();    
-            powerLeft =  Range.clip(powerLeft, -1.0, 1.0) ;
-            powerRight = Range.clip(powerRight, -1.0, 1.0) ;
-            
-            leftDrive0.setPower(-powerLeft);
-            rightDrive1.setPower(powerRight);
-            leftDrive3.setPower(powerLeft);
-            rightDrive2.setPower(-powerRight);
-            
             telemetry.addData("Status", "Run Time");
             telemetry.update();
-
-            leftDrive0.setPower(-gamepad1.left_stick_y);
-            rightDrive1.setPower(-gamepad1.right_stick_y);
-            leftDrive3.setPower(-gamepad1.left_stick_y);
-            rightDrive2.setPower(-gamepad1.right_stick_y);
-            
-            if(gamepad1.b){
-                strafe(1, "right");
-            }
-            else if(gamepad1.x){
+                
+            if (gamepad1.left_bumper)
                 strafe(1, "left");
+            else if (gamepad1.right_bumper)
+                strafe(1, "right");
+            else{
+                powerLeft =  Range.clip(powerLeft, -1.0, 1.0) ;
+                powerRight = Range.clip(powerRight, -1.0, 1.0) ;
+    
+                leftDrive0.setPower(-powerLeft);
+                rightDrive1.setPower(powerRight);
+                leftDrive3.setPower(powerLeft);
+                rightDrive2.setPower(-powerRight);
+    
+                telemetry.addData("Status", "Run Time");
+                telemetry.update();
+    
+                leftDrive0.setPower(-gamepad1.left_stick_y);
+                rightDrive1.setPower(-gamepad1.right_stick_y);
+                leftDrive3.setPower(-gamepad1.left_stick_y);
+                rightDrive2.setPower(-gamepad1.right_stick_y);
             }
-            
         }
     }
 }

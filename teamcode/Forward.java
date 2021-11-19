@@ -57,12 +57,12 @@ public class Forward extends LinearOpMode {
             leftDrive3.setPower(power*-1);
             rightDrive2.setPower(power*-1);
             
-            rightDrive1.setPower(power);
-            leftDrive0.setPower(power);
+            rightDrive1.setPower(power*0.9);
+            leftDrive0.setPower(power*0.9);
         }
         else if (direction.equals("right")){
-            leftDrive3.setPower(power);
-            rightDrive2.setPower(power);
+            leftDrive3.setPower(power*0.9);
+            rightDrive2.setPower(power*0.9);
             
             rightDrive1.setPower(power*-1);
             leftDrive0.setPower(power*-1);
@@ -141,13 +141,13 @@ public class Forward extends LinearOpMode {
         
         
  
-        strafe(0.75, "left");
+        strafe(0.7, "left");
         sleep(1000);
         
         stopMotors();
-        sleep(1500);
+        sleep(1000);
         
-        strafe(0.75, "right");
+        strafe(0.7, "right");
         sleep(1000);
 /*
         setMotorPower(1);
