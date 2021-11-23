@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -26,43 +28,97 @@ public class Controller extends LinearOpMode {
     DcMotor rightDrive1; //motor 2
     DcMotor rightDrive2; //motor 3
     
+    //Servos
+    Servo servo0;
+
     Gamepad control = new Gamepad();
+
+    public void setMotorPower(double power){
+        leftDrive0.setPower(power);
+        leftDrive3.setPower(power);
+
+        rightDrive1.setPower(power);
+        rightDrive2.setPower(power);
+    }
+    //sets left and right motors power seperately
+    public void setMotorPower(double powerLeft, double powerRight){
+        leftDrive0.setPower(powerLeft);
+        leftDrive3.setPower(powerLeft);
+
+        rightDrive1.setPower(powerRight);
+        rightDrive2.setPower(powerRight);
+    }
+    
+    public void strafe(double power, String direction){
+        power = Math.abs(power);
+        if (direction.equals("left")){
+            leftDrive3.setPower(power*-1);
+            rightDrive2.setPower(power*-1);
+            
+            rightDrive1.setPower(power);
+            leftDrive0.setPower(power);
+        }
+        else if (direction.equals("right")){
+            leftDrive3.setPower(power);
+            rightDrive2.setPower(power);
+            
+            rightDrive1.setPower(power*-1);
+            leftDrive0.setPower(power*-1);
+        }
+        
+    }
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        leftDrive0  = hardwareMap.get(DcMotor.class, "leftDrive0");
-        leftDrive3 = hardwareMap.get(DcMotor.class, "leftDrive3");
-        rightDrive1  = hardwareMap.get(DcMotor.class, "rightDrive1");
+        leftDrive0 = hardwareMap.get(DcMotor.class, "leftDrive0");
+        rightDrive1 = hardwareMap.get(DcMotor.class, "rightDrive1");
+
+        leftDrive3  = hardwareMap.get(DcMotor.class, "leftDrive3");
         rightDrive2 = hardwareMap.get(DcMotor.class, "rightDrive2");
 
+
+        // Most robots need the motor on one side to be reversed to drive forward
+        // Reverse the motor that runs backwards when connected directly to the battery
+
         leftDrive0.setDirection(DcMotor.Direction.FORWARD);
-        leftDrive3.setDirection(DcMotor.Direction.FORWARD);
         rightDrive1.setDirection(DcMotor.Direction.REVERSE);
+
+        leftDrive3.setDirection(DcMotor.Direction.FORWARD);
         rightDrive2.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();
         runtime.reset();
-        
-        double leftPower;
-        double rightPower;
+            
+            /*
+            double powerLeft = gamepad1.left_stick_y;
+            double powerRight= gamepad1.right_stick_y;
+            double turn  =  gamepad1.right_stick_y;
+            boolean ifStick = false;
+            */
 
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time");
             telemetry.update();
-
-            double driveLeft = -gamepad1.left_stick_y;
-            double driveRight= -gamepad1.right_stick_y;
-            //double turn  =  gamepad1.right_stick_y;
-            leftPower =  Range.clip(driveLeft, -1.0, 1.0) ;
-            rightPower  = Range.clip(driveRight, -1.0, 1.0) ;
-            
-            leftDrive0.setPower(leftPower);
-            rightDrive1.setPower(rightPower);
-            rightDrive2.setPower(rightPower);
-            leftDrive3.setPower(leftPower);
+                
+            if (gamepad1.left_bumper)
+                strafe(1, "left");
+            else if (gamepad1.right_bumper)
+                strafe(1, "right");
+                
+            else if (gamepad1.a)
+                setMotorPower(1);
+            else if (gamepad1.b)
+                setMotorPower(-1);
+                
+            else{
+                leftDrive0.setPower(-gamepad1.left_stick_y);
+                rightDrive1.setPower(-gamepad1.right_stick_y);
+                leftDrive3.setPower(-gamepad1.left_stick_y);
+                rightDrive2.setPower(-gamepad1.right_stick_y);
+            }
         }
     }
 }
